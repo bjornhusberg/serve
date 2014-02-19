@@ -1,4 +1,4 @@
 serve
 =====
 
-An insanely small web server based on netcat.
+A minimal (as in insanely small) web server based on netcat.
