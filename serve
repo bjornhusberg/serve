@@ -19,8 +19,7 @@ while true; do {
 		cat "$file"
 	else
 		echo "Not found: $file" >&2
-		echo -n -e "HTTP/1.1 404 Not Found\n\n"
-		echo "<html><body><h1>404 - Not Found</h1></body></html>"
+		echo -n -e "HTTP/1.1 404 Not Found\n\n<html><body><h1>404 - Not Found</h1></body></html>"
 	fi
 } | nc -l $port > $pipe
 done
