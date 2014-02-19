@@ -1,30 +1,26 @@
 #!/bin/bash
+for command in nc mkfifo sed grep; do
+	if [ "$(which $command)" == "" ]; then echo -e "Please install $command"; exit 1; fi
+done
 pipe=/tmp/serve_$RANDOM
 port=8080
-if [ $# -gt 0 ]
-then
-	port="$1"
-fi
+if [ $# -gt 0 ]; then port="$1"; fi
 mkfifo $pipe
 echo "Web server is up: http://localhost:$port/" >&2
-while true
-do
-   	{
-	    read line < $pipe
-	    file=$(echo $line | grep GET | sed 's/GET \/\(.*\) HTTP\/1\.1.*/\1/')
-	    if [ "$file" == "" ]
-	    then
-	    	file="index.html"
-	    fi
-	    if [ -f "$file" ]
-	    then
-			echo "Sending $file" >&2
-			echo -n -e "HTTP/1.1 200 OK\nContent-type: text/html\n\n"
-			cat "$file"
-		else
-			echo "Not found: $file" >&2
-			echo -n -e "HTTP/1.1 404 Not Found\n\n"
-			echo "<html><body><h1>404 - Not Found</h1></body></html>"
-		fi
-   	} | nc -l $port > $pipe
+while true; do {
+	read line < $pipe
+	file=$(echo $line | grep GET | sed 's/GET \/\(.*\) HTTP\/1\.1.*/\1/')
+	if [ "$file" == "" ]; then
+		file="index.html"
+	fi
+	if [ -f "$file" ]; then
+		echo "Sending $file" >&2
+		echo -n -e "HTTP/1.1 200 OK\nContent-type: text/html\n\n"
+		cat "$file"
+	else
+		echo "Not found: $file" >&2
+		echo -n -e "HTTP/1.1 404 Not Found\n\n"
+		echo "<html><body><h1>404 - Not Found</h1></body></html>"
+	fi
+} | nc -l $port > $pipe
 done
